@@ -71,7 +71,7 @@ public class ManageRightsService {
 	}
 	
 	public UserRight addUserRights(UserRightsRequest userRightsRequest) {
-		Optional<UserRight> existUserRight = manageRightsRepository.findById(userRightsRequest.idUser);
+		Optional<UserRight> existUserRight = manageRightsRepository.findByIdUser(userRightsRequest.idUser);
 		List<ReferentialUserRight> referentialUserRights = referentialUserRightRepository.findByLabelIn(userRightsRequest.referentialUserRights);
 		UserRight createUserRight = new UserRight();
 		
@@ -104,7 +104,7 @@ public class ManageRightsService {
 	}
 	
 	public UserRight updateUserRights(UserRightsRequest userRightsRequest) {
-		Optional<UserRight> existUserRight = manageRightsRepository.findById(userRightsRequest.idUser);
+		Optional<UserRight> existUserRight = manageRightsRepository.findByIdUser(userRightsRequest.idUser);
 		List<ReferentialUserRight> referentialUserRights = referentialUserRightRepository.findByLabelIn(userRightsRequest.referentialUserRights);
 		UserRight createUserRight = new UserRight();
 

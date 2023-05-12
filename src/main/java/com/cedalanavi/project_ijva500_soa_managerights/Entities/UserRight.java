@@ -5,6 +5,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -16,21 +18,32 @@ import javax.persistence.Table;
 public class UserRight {
 	
 	@Id
-	private int idUser;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int idUserRight;
+	
+	private String idUser;
 
 	private String username;
 	
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable( name = "userRightAssociation",
-                joinColumns = @JoinColumn(name = "idUser"),
+                joinColumns = @JoinColumn(name = "idUserRight"),
                 inverseJoinColumns = @JoinColumn( name = "idRight" ) )
 	private List<ReferentialUserRight> referentialUserRights;
 
-	public int getIdUser() {
+	public int getIdUserRight() {
+		return idUserRight;
+	}
+
+	public void setIdUserRight(int idUserRight) {
+		this.idUserRight = idUserRight;
+	}
+
+	public String getIdUser() {
 		return idUser;
 	}
 
-	public void setIdUser(int idUser) {
+	public void setIdUser(String idUser) {
 		this.idUser = idUser;
 	}
 

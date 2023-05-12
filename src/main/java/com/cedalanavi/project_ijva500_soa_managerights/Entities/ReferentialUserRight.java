@@ -29,7 +29,7 @@ public class ReferentialUserRight {
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable( name = "userRightAssociation",
                 joinColumns = @JoinColumn(name = "idRight"),
-                inverseJoinColumns = @JoinColumn( name = "idUser") )
+                inverseJoinColumns = @JoinColumn( name = "idUserRight") )
     private List<UserRight> userRights;
 
 	public int getIdRight() {
