@@ -11,4 +11,6 @@ public interface ManageRightsRepository extends JpaRepository<UserRight, Integer
 	Optional<UserRight> findByUsername(String username);
 	
 	Optional<UserRight> findByIdUser(String idUser);
+	
+	void deleteByIdUser(String idUser);
 }

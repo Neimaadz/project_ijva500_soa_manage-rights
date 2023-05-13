@@ -1,6 +1,6 @@
 package com.cedalanavi.project_ijva500_soa_managerights.Data;
 
-public class UpdateReferentialUserRightRequest {
+public class ReferentialUserRightUpdateRequest {
 
 	public int idRight;
 	

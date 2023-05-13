@@ -7,10 +7,12 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.cedalanavi.project_ijva500_soa_managerights.Data.AddReferentialUserRightRequest;
-import com.cedalanavi.project_ijva500_soa_managerights.Data.UpdateReferentialUserRightRequest;
-import com.cedalanavi.project_ijva500_soa_managerights.Data.UserRightsRequest;
+import com.cedalanavi.project_ijva500_soa_managerights.Data.ReferentialUserRightCreateRequest;
+import com.cedalanavi.project_ijva500_soa_managerights.Data.ReferentialUserRightUpdateRequest;
+import com.cedalanavi.project_ijva500_soa_managerights.Data.UserRightsCreateRequest;
+import com.cedalanavi.project_ijva500_soa_managerights.Data.UserRightsUpdateRequest;
 import com.cedalanavi.project_ijva500_soa_managerights.Entities.ReferentialUserRight;
 import com.cedalanavi.project_ijva500_soa_managerights.Entities.UserRight;
 import com.cedalanavi.project_ijva500_soa_managerights.Repositories.ManageRightsRepository;
@@ -29,8 +31,8 @@ public class ManageRightsService {
 		return referentialUserRightRepository.findAll();
 	}
 
-	public List<ReferentialUserRight> addUserRightReferentials(AddReferentialUserRightRequest addReferentialUserRightRequest) {
-		List<ReferentialUserRight> existReferentialUserRights = referentialUserRightRepository.findByLabelIn(addReferentialUserRightRequest.labels);
+	public List<ReferentialUserRight> addUserRightReferentials(ReferentialUserRightCreateRequest referentialUserRightCreateRequest) {
+		List<ReferentialUserRight> existReferentialUserRights = referentialUserRightRepository.findByLabelIn(referentialUserRightCreateRequest.labels);
 		List<ReferentialUserRight> referentialUserRights = new ArrayList<ReferentialUserRight>();
 
 		// Throw exception if one element of referential user right already exist
@@ -38,7 +40,7 @@ public class ManageRightsService {
 			throw new IllegalArgumentException("Values already exists.");
 		}
 
-		addReferentialUserRightRequest.labels.forEach(t -> {
+		referentialUserRightCreateRequest.labels.forEach(t -> {
 			ReferentialUserRight referentialUserRight = new ReferentialUserRight();
 			referentialUserRight.setLabel(t);
 			
@@ -50,13 +52,13 @@ public class ManageRightsService {
 		return referentialUserRightRepository.findAll();
 	}
 
-	public List<ReferentialUserRight> updateUserRightReferentials(UpdateReferentialUserRightRequest updateReferentialUserRightRequest) {
-		Optional<ReferentialUserRight> existReferentialUserRight = referentialUserRightRepository.findById(updateReferentialUserRightRequest.idRight);
+	public List<ReferentialUserRight> updateUserRightReferentials(ReferentialUserRightUpdateRequest referentialUserRightUpdateRequest) {
+		Optional<ReferentialUserRight> existReferentialUserRight = referentialUserRightRepository.findById(referentialUserRightUpdateRequest.idRight);
 
 		if (!existReferentialUserRight.isPresent()) {
 			throw new NoSuchElementException();
 		}
-		existReferentialUserRight.get().setLabel(updateReferentialUserRightRequest.label);
+		existReferentialUserRight.get().setLabel(referentialUserRightUpdateRequest.label);
 		referentialUserRightRepository.save(existReferentialUserRight.get());
 		
 		return referentialUserRightRepository.findAll();
@@ -70,13 +72,13 @@ public class ManageRightsService {
 		return manageRightsRepository.findByUsername(username).get();
 	}
 	
-	public UserRight addUserRights(UserRightsRequest userRightsRequest) {
-		Optional<UserRight> existUserRight = manageRightsRepository.findByIdUser(userRightsRequest.idUser);
-		List<ReferentialUserRight> referentialUserRights = referentialUserRightRepository.findByLabelIn(userRightsRequest.referentialUserRights);
+	public UserRight addUserRights(UserRightsCreateRequest userRightsCreateRequest) {
+		Optional<UserRight> existUserRight = manageRightsRepository.findByIdUser(userRightsCreateRequest.idUser);
+		List<ReferentialUserRight> referentialUserRights = referentialUserRightRepository.findByLabelIn(userRightsCreateRequest.referentialUserRights);
 		UserRight createUserRight = new UserRight();
 		
 		// Throw exception if one element of referential user right not found in database
-		if (referentialUserRights.size() != userRightsRequest.referentialUserRights.size()) {
+		if (referentialUserRights.size() != userRightsCreateRequest.referentialUserRights.size()) {
 			throw new NoSuchElementException();
 		}
 		
@@ -94,33 +96,30 @@ public class ManageRightsService {
 			
 			createUserRight = existUserRight.get();
 		} else {
-			createUserRight.setIdUser(userRightsRequest.idUser);
+			createUserRight.setIdUser(userRightsCreateRequest.idUser);
 			createUserRight.setReferentialUserRights(referentialUserRights);
 		}
-		createUserRight.setUsername(userRightsRequest.username);
+		createUserRight.setUsername(userRightsCreateRequest.username);
 		manageRightsRepository.save(createUserRight);
 		
 		return createUserRight;
 	}
 	
-	public UserRight updateUserRights(UserRightsRequest userRightsRequest) {
-		Optional<UserRight> existUserRight = manageRightsRepository.findByIdUser(userRightsRequest.idUser);
-		List<ReferentialUserRight> referentialUserRights = referentialUserRightRepository.findByLabelIn(userRightsRequest.referentialUserRights);
-		UserRight createUserRight = new UserRight();
+	public UserRight updateUserRights(String idUser, UserRightsUpdateRequest userRightsUpdateRequest) {
+		UserRight existUserRight = manageRightsRepository.findByIdUser(idUser).orElseThrow();
+		List<ReferentialUserRight> referentialUserRights = referentialUserRightRepository.findByLabelIn(userRightsUpdateRequest.referentialUserRights);
 
 		// Throw exception if one element of referential user right not found in database
-		if (referentialUserRights.size() != userRightsRequest.referentialUserRights.size()) {
+		if (referentialUserRights.size() != userRightsUpdateRequest.referentialUserRights.size()) {
 			throw new NoSuchElementException();
 		}
+		existUserRight.setReferentialUserRights(referentialUserRights);
 		
-		if (existUserRight.isPresent()) {
-			existUserRight.get().setReferentialUserRights(referentialUserRights);;
-			createUserRight = existUserRight.get();
-			createUserRight.setUsername(userRightsRequest.username);
-			
-			manageRightsRepository.save(createUserRight);
-		}
-		
-		return createUserRight;
+		return manageRightsRepository.save(existUserRight);
+	}
+
+	@Transactional
+	public void deleteUserRights(String idUser) {
+		manageRightsRepository.deleteByIdUser(idUser);
 	}
 }
